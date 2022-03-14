@@ -9,21 +9,22 @@ french_word = pandas.read_csv(data_file)
 
 f2e = french_word.to_dict(orient='records')
 
-current_card = 0
+current_card = {}
 
 
 def next_card():
-    global current_card
+    global current_card, flip_time
+    window.after_cancel(flip_time)
     current_card = random.choice(f2e)
-    canvas.itemconfig(title, text='French')
-    canvas.itemconfig(word, text=current_card['French'])
-    print(current_card['French'])
-    f = window.after(3000, flip)
-    print(current_card['English'])
+    canvas.itemconfig(title, text='French', fill='black')
+    canvas.itemconfig(word, text=current_card['French'], fill='black')
+    canvas.itemconfig(card, image=card_front)
+    #print(current_card['French'])
+    flip_time = window.after(2000, flip)
+    #print(current_card['English'])
 
 
 def flip():
-    global current_card
     canvas.itemconfig(card, image=card_back)
     canvas.itemconfig(title, text='English', fill='white')
     canvas.itemconfig(word, text=current_card['English'], fill='white')
@@ -32,7 +33,7 @@ def flip():
 window = Tk()
 window.title("Flash Card Project")
 window.config(padx=50, pady=50, bg=BACKGROUND_COLOR)
-
+flip_time = window.after(2000, func=flip)
 #images------------------------------------------------------------------
 card_front = PhotoImage(file="images/card_front.png")
 card_back = PhotoImage(file="images/card_back.png")
@@ -43,13 +44,13 @@ wrong = PhotoImage(file="images/wrong.png")
 canvas = Canvas(width=800, height=526)
 
 #Image position on canvas------------------------------------------------
-card = canvas.create_image(400, 263, image=card_front)
+card = canvas.create_image(400, 263, image='')
 canvas.config(bg=BACKGROUND_COLOR, highlightthickness=0)
 canvas.grid(row=0, column=0, columnspan=2, sticky='EW')
 
 #text on canvas----------------------------------------------------------
-title = canvas.create_text(400, 140, text="French", font=("Ariel", 40, 'italic'))
-word = canvas.create_text(400, 263, text="Word", font=("Ariel", 60, 'bold'))
+title = canvas.create_text(400, 140, text="", font=("Ariel", 40, 'italic'))
+word = canvas.create_text(400, 263, text="", font=("Ariel", 60, 'bold'))
 
 #buttons
 button1 = Button(image=right, highlightthickness=0, command=next_card)
