@@ -1,20 +1,27 @@
 import random
 from tkinter import *
 import pandas
+from tkinter import messagebox
+import os
 
 BACKGROUND_COLOR = "#B1DDC6"
 
-data_file = "data/french_words.csv"
-french_word = pandas.read_csv(data_file)
-
-f2e = french_word.to_dict(orient='records')
-
 current_card = {}
+f2e = {}
+#-------------------------------------------------Exception Handling----------------------------------------------------
+try:
+    data_file = pandas.read_csv('data/words_to_learn.csv')
+except FileNotFoundError:
+    old_data = pandas.read_csv("data/french_words.csv")
+    f2e = old_data.to_dict(orient='records')
+else:
+    f2e = data_file.to_dict(orient='records')
 
-
+#-------------------------------------------------functions-------------------------------------------------------------
 def next_card():
-    global current_card, flip_time
+    global current_card, flip_time, f2e
     window.after_cancel(flip_time)
+
     current_card = random.choice(f2e)
     canvas.itemconfig(title, text='French', fill='black')
     canvas.itemconfig(word, text=current_card['French'], fill='black')
@@ -24,12 +31,22 @@ def next_card():
     #print(current_card['English'])
 
 
+
 def flip():
     canvas.itemconfig(card, image=card_back)
     canvas.itemconfig(title, text='English', fill='white')
     canvas.itemconfig(word, text=current_card['English'], fill='white')
 
-#---------------------------------------------------UI Setup------------------------------------------------------
+
+def is_known():
+    f2e.remove(current_card)
+    #print(current_card)
+    #print(len(f2e))
+    data = pandas.DataFrame(f2e)
+    data.to_csv('data/words_to_learn.csv', index=False)
+    next_card()
+
+#------------------------------------------------------UI Setup---------------------------------------------------------
 window = Tk()
 window.title("Flash Card Project")
 window.config(padx=50, pady=50, bg=BACKGROUND_COLOR)
@@ -50,14 +67,14 @@ canvas.grid(row=0, column=0, columnspan=2, sticky='EW')
 
 #text on canvas----------------------------------------------------------
 title = canvas.create_text(400, 140, text="", font=("Ariel", 40, 'italic'))
-word = canvas.create_text(400, 263, text="", font=("Ariel", 60, 'bold'))
+word = canvas.create_text(400, 263, text="", font=("Ariel", 65, 'bold'))
 
-#buttons
-button1 = Button(image=right, highlightthickness=0, command=next_card)
-button1.grid(row=1, column=0)
+#buttons-----------------------------------------------------------------
+right_button = Button(image=right, highlightthickness=0, command=is_known)
+right_button.grid(row=1, column=0)
 
-button2 = Button(image=wrong, highlightthickness=0, command=next_card)
-button2.grid(row=1, column=1)
+cross_button = Button(image=wrong, highlightthickness=0, command=next_card)
+cross_button.grid(row=1, column=1)
 
 next_card()
 
