@@ -21,14 +21,19 @@ else:
 def next_card():
     global current_card, flip_time, f2e
     window.after_cancel(flip_time)
-
-    current_card = random.choice(f2e)
-    canvas.itemconfig(title, text='French', fill='black')
-    canvas.itemconfig(word, text=current_card['French'], fill='black')
-    canvas.itemconfig(card, image=card_front)
-    #print(current_card['French'])
-    flip_time = window.after(2000, flip)
-    #print(current_card['English'])
+    try:
+        current_card = random.choice(f2e)
+        canvas.itemconfig(title, text='French', fill='black')
+        canvas.itemconfig(word, text=current_card['French'], fill='black')
+        canvas.itemconfig(card, image=card_front)
+        #print(current_card['French'])
+        flip_time = window.after(2000, flip)
+        #print(current_card['English'])
+    except IndexError:
+        messagebox.showinfo(title="Congratulation", message=" You've learned all the words!")
+        file = 'data/words_to_learn.csv'
+        if(os.path.exists(file) and os.path.isfile(file)):
+            os.remove(file)
 
 
 
